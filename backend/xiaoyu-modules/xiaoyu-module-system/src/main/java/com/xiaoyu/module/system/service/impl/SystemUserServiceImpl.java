@@ -1,7 +1,7 @@
 package com.xiaoyu.module.system.service.impl;
 
 import cn.hutool.crypto.digest.BCrypt;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.xiaoyu.common.core.exception.ServiceException;
 import com.xiaoyu.module.system.entity.SystemUser;
 import com.xiaoyu.module.system.mapper.SystemUserMapper;
@@ -33,7 +33,7 @@ public class SystemUserServiceImpl implements SystemUserService {
 
     @Override
     public UserVO getUserById(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
+        SystemUser user = systemUserMapper.selectOneById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
@@ -42,9 +42,9 @@ public class SystemUserServiceImpl implements SystemUserService {
 
     @Override
     public UserVO getUserByUsername(String username) {
-        LambdaQueryWrapper<SystemUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SystemUser::getUsername, username);
-        SystemUser user = systemUserMapper.selectOne(queryWrapper);
+        QueryWrapper queryWrapper = QueryWrapper.create()
+            .where("username", username);
+        SystemUser user = systemUserMapper.selectOneByQuery(queryWrapper);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
@@ -55,9 +55,9 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Transactional(rollbackFor = Exception.class)
     public Long createUser(SystemUser user) {
         // 检查用户名是否存在
-        LambdaQueryWrapper<SystemUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SystemUser::getUsername, user.getUsername());
-        Long count = systemUserMapper.selectCount(queryWrapper);
+        QueryWrapper queryWrapper = QueryWrapper.create()
+            .where("username", user.getUsername());
+        Long count = systemUserMapper.selectCountByQuery(queryWrapper);
         if (count > 0) {
             throw new ServiceException("用户已存在");
         }
@@ -72,20 +72,20 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUser(SystemUser user) {
-        SystemUser existUser = systemUserMapper.selectById(user.getUserId());
+        SystemUser existUser = systemUserMapper.selectOneById(user.getUserId());
         if (existUser == null) {
             throw new ServiceException("用户不存在");
         }
 
         // 不更新密码
         user.setPassword(null);
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
+        SystemUser user = systemUserMapper.selectOneById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
@@ -95,19 +95,19 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void resetPassword(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
+        SystemUser user = systemUserMapper.selectOneById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
         // 默认密码：123456
         user.setPassword(BCrypt.hashpw("123456"));
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void changePassword(Long userId, String oldPassword, String newPassword) {
-        SystemUser user = systemUserMapper.selectById(userId);
+        SystemUser user = systemUserMapper.selectOneById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
@@ -119,18 +119,18 @@ public class SystemUserServiceImpl implements SystemUserService {
 
         // 设置新密码
         user.setPassword(BCrypt.hashpw(newPassword));
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long userId, Integer status) {
-        SystemUser user = systemUserMapper.selectById(userId);
+        SystemUser user = systemUserMapper.selectOneById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
         user.setStatus(status);
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override

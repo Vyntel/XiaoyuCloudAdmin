@@ -1,6 +1,7 @@
 package com.xiaoyu.module.system.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,12 +11,12 @@ import java.util.Date;
  * 系统用户实体
  */
 @Data
-@TableName("sys_user")
+@Table("sys_user")
 public class SystemUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "user_id", type = IdType.AUTO)
+    @Id
     private Long userId;
     private String username;
     private String password;
@@ -28,10 +29,7 @@ public class SystemUser implements Serializable {
     private Integer status;
     private Long tenantId;
 
-    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     private String remark;
