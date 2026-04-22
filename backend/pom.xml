@@ -71,6 +71,9 @@
         <spring-boot-actuator.version>3.2.4</spring-boot-actuator.version>
         <prometheus.client.version>1.12.5</prometheus.client.version>
 
+        <!-- Knife4j -->
+        <knife4j.version>4.5.0</knife4j.version>
+
         <!-- 其他 -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-io.version>2.18.0</commons-io.version>
@@ -285,6 +288,13 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
+            </dependency>
+
+            <!-- Knife4j -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
 
             <!-- 项目内部模块 -->

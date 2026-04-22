@@ -26,6 +26,10 @@ xiaoyu:
       - /auth/logout
       - /health
       - /actuator/**
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /doc.html
+      - /webjars/**
 
 # MyBatis-Flex 配置
 mybatis-flex:
@@ -44,6 +48,23 @@ management:
   endpoint:
     health:
       show-details: always
+
+# Knife4j 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-suffix: -
+    operations-suffix: -
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.xiaoyu
+  knife4j:
+    enable: true
+    setting:
+      language: zh_CN
 
 # 日志配置
 logging:
