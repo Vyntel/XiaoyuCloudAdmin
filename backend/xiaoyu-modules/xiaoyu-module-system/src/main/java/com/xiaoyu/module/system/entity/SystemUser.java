@@ -27,12 +27,12 @@ public class SystemUser implements Serializable {
     private Long deptId;
     private Integer status;
     private Long tenantId;
-    
+
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
-    
+
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
-    
+
     private String remark;
 }

@@ -39,7 +39,7 @@
         <!-- 数据库版本 -->
         <mysql.version>8.0.33</mysql.version>
         <druid.version>1.2.23</druid.version>
-        <mybatis-flex.version>3.1.2</mybatis-flex.version>
+        <mybatis-flex.version>1.10.8</mybatis-flex.version>
 
         <!-- Redis 版本 -->
         <redisson.version>3.27.2</redisson.version>
@@ -129,12 +129,12 @@
             </dependency>
             <dependency>
                 <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-spring-boot-starter</artifactId>
+                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
                 <version>${mybatis-flex.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-annotation</artifactId>
+                <artifactId>mybatis-flex-core</artifactId>
                 <version>${mybatis-flex.version}</version>
             </dependency>
 
