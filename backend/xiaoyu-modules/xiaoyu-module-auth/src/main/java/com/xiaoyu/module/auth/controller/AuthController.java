@@ -5,6 +5,9 @@ import com.xiaoyu.api.auth.dto.RegisterDTO;
 import com.xiaoyu.api.auth.vo.LoginVO;
 import com.xiaoyu.common.core.result.Result;
 import com.xiaoyu.module.auth.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 认证 Controller
  */
+@Tag(name = "认证授权", description = "用户登录注册、Token刷新")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class AuthController {
     /**
      * 用户登录
      */
+    @Operation(summary = "用户登录")
     @PostMapping("/login")
     public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         return Result.success(authService.login(
@@ -36,6 +41,7 @@ public class AuthController {
     /**
      * 用户登出
      */
+    @Operation(summary = "用户登出")
     @PostMapping("/logout")
     public Result<Void> logout() {
         authService.logout();
@@ -45,6 +51,7 @@ public class AuthController {
     /**
      * 用户注册
      */
+    @Operation(summary = "用户注册")
     @PostMapping("/register")
     public Result<Long> register(@Valid @RequestBody RegisterDTO registerDTO) {
         return Result.success(authService.register(
@@ -59,6 +66,7 @@ public class AuthController {
     /**
      * 刷新Token
      */
+    @Operation(summary = "刷新Token")
     @PostMapping("/refresh-token")
     public Result<LoginVO> refreshToken(@RequestHeader("Authorization") String authorization) {
         String token = authorization.replace("Bearer ", "");
@@ -68,6 +76,7 @@ public class AuthController {
     /**
      * 获取验证码
      */
+    @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
     public Result<String> getCaptcha(@RequestParam("captchaId") String captchaId) {
         return Result.success(authService.getCaptcha(captchaId));
@@ -76,6 +85,7 @@ public class AuthController {
     /**
      * 发送短信验证码
      */
+    @Operation(summary = "发送短信验证码")
     @GetMapping("/sms/{phone}")
     public Result<Void> sendSmsCode(@PathVariable("phone") String phone) {
         authService.sendSmsCode(phone);
@@ -85,6 +95,7 @@ public class AuthController {
     /**
      * 发送邮箱验证码
      */
+    @Operation(summary = "发送邮箱验证码")
     @GetMapping("/email/{email}")
     public Result<Void> sendEmailCode(@PathVariable("email") String email) {
         authService.sendEmailCode(email);

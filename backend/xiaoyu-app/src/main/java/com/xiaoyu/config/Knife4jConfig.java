@@ -23,7 +23,7 @@ public class Knife4jConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Xiaoyu")
-                                .email("xiaoyu@example.com")
+                                .email("xiaoyuechoes@gmail.com")
                                 .url("https://github.com/Vyntel/XiaoyuCloudAdmin")))
                 .schemaRequirement("Bearer", new SecurityScheme()
                         .type(SecurityScheme.Type.HTTP)

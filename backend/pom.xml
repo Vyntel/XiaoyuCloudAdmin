@@ -301,7 +301,6 @@
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
-
             <!-- 项目内部模块 -->
             <dependency>
                 <groupId>com.xiaoyu</groupId>
@@ -311,6 +310,11 @@
             <dependency>
                 <groupId>com.xiaoyu</groupId>
                 <artifactId>xiaoyu-common-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xiaoyu</groupId>
+                <artifactId>xiaoyu-common-swagger</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

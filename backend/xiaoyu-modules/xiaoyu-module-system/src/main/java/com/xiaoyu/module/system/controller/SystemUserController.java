@@ -6,6 +6,9 @@ import com.xiaoyu.common.core.result.PageResult;
 import com.xiaoyu.common.core.result.Result;
 import com.xiaoyu.module.system.entity.SystemUser;
 import com.xiaoyu.module.system.service.SystemUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +17,7 @@ import java.util.List;
 /**
  * 系统用户 Controller
  */
+@Tag(name = "系统用户", description = "系统用户管理")
 @RestController
 @RequestMapping("/system/user")
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class SystemUserController {
     /**
      * 分页查询用户列表
      */
+    @Operation(summary = "分页查询用户列表")
     @GetMapping("/page")
     public Result<PageResult<UserVO>> getUserPage(
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
@@ -39,6 +44,7 @@ public class SystemUserController {
     /**
      * 获取用户详情
      */
+    @Operation(summary = "获取用户详情")
     @GetMapping("/{userId}")
     public Result<UserVO> getUserById(@PathVariable("userId") Long userId) {
         return Result.success(systemUserService.getUserById(userId));
@@ -47,6 +53,7 @@ public class SystemUserController {
     /**
      * 根据用户名获取用户信息
      */
+    @Operation(summary = "根据用户名获取用户信息")
     @GetMapping("/username/{username}")
     public Result<UserVO> getUserByUsername(@PathVariable("username") String username) {
         return Result.success(systemUserService.getUserByUsername(username));
@@ -55,6 +62,7 @@ public class SystemUserController {
     /**
      * 新增用户
      */
+    @Operation(summary = "新增用户")
     @PostMapping
     public Result<Long> createUser(@RequestBody UserDTO userDTO) {
         SystemUser user = convertToEntity(userDTO);
@@ -64,6 +72,7 @@ public class SystemUserController {
     /**
      * 修改用户
      */
+    @Operation(summary = "修改用户")
     @PutMapping
     public Result<Void> updateUser(@RequestBody UserDTO userDTO) {
         SystemUser user = convertToEntity(userDTO);
@@ -74,6 +83,7 @@ public class SystemUserController {
     /**
      * 删除用户
      */
+    @Operation(summary = "删除用户")
     @DeleteMapping("/{userId}")
     public Result<Void> deleteUser(@PathVariable("userId") Long userId) {
         systemUserService.deleteUser(userId);
@@ -83,6 +93,7 @@ public class SystemUserController {
     /**
      * 重置密码
      */
+    @Operation(summary = "重置密码")
     @PutMapping("/{userId}/reset-password")
     public Result<Void> resetPassword(@PathVariable("userId") Long userId) {
         systemUserService.resetPassword(userId);
@@ -92,6 +103,7 @@ public class SystemUserController {
     /**
      * 修改状态
      */
+    @Operation(summary = "修改用户状态")
     @PutMapping("/{userId}/status")
     public Result<Void> updateStatus(
             @PathVariable("userId") Long userId,
@@ -103,6 +115,7 @@ public class SystemUserController {
     /**
      * 分配角色
      */
+    @Operation(summary = "分配角色")
     @PutMapping("/{userId}/roles")
     public Result<Void> assignRoles(
             @PathVariable("userId") Long userId,
@@ -114,6 +127,7 @@ public class SystemUserController {
     /**
      * 获取用户角色ID列表
      */
+    @Operation(summary = "获取用户角色ID列表")
     @GetMapping("/{userId}/role-ids")
     public Result<List<Long>> getUserRoleIds(@PathVariable("userId") Long userId) {
         return Result.success(systemUserService.getUserRoleIds(userId));
