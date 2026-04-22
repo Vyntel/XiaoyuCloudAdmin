@@ -137,6 +137,11 @@
                 <artifactId>mybatis-flex-core</artifactId>
                 <version>${mybatis-flex.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-annotation</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
 
             <!-- Redis -->
             <dependency>
