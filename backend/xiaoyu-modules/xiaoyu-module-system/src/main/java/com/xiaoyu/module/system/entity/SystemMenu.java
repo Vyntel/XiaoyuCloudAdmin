@@ -1,6 +1,5 @@
 package com.xiaoyu.module.system.entity;
 
-import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.xiaoyu.common.core.entity.TenantEntity;
 import lombok.Data;
@@ -16,8 +15,7 @@ public class SystemMenu extends TenantEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private Long menuId;
+
     private String menuName;
     private Long parentId;
     private Integer orderNum;

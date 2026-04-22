@@ -30,6 +30,7 @@ xiaoyu:
       - /v3/api-docs/**
       - /doc.html
       - /webjars/**
+      - /favicon.ico
 
 # MyBatis-Flex 配置
 mybatis-flex:

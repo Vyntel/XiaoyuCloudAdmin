@@ -1,5 +1,6 @@
 package com.xiaoyu.module.system.service;
 
+import com.mybatisflex.core.service.IService;
 import com.xiaoyu.module.system.entity.SystemRole;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * 角色Service接口
  */
-public interface SystemRoleService {
+public interface SystemRoleService extends IService<SystemRole> {
 
     /**
      * 根据角色编码查询角色

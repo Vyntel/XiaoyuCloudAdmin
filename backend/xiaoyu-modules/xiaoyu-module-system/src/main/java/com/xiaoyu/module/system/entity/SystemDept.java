@@ -1,6 +1,5 @@
 package com.xiaoyu.module.system.entity;
 
-import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import com.xiaoyu.common.core.entity.TenantEntity;
 import lombok.Data;
@@ -16,8 +15,6 @@ public class SystemDept extends TenantEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private Long deptId;
     private Long parentId;
     private String deptName;
     private String deptCode;

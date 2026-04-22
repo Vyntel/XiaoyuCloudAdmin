@@ -17,7 +17,7 @@ public class UserVO implements Serializable {
     /**
      * 用户ID
      */
-    private Long userId;
+    private Long id;
 
     /**
      * 用户名

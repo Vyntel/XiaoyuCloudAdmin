@@ -124,7 +124,7 @@ public class SystemUserController {
      */
     private SystemUser convertToEntity(UserDTO dto) {
         SystemUser user = new SystemUser();
-        user.setUserId(dto.getUserId());
+        user.setId(dto.getId());
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
         user.setNickname(dto.getNickname());
