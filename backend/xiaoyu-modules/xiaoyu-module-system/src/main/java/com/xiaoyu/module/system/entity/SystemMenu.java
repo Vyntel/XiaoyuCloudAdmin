@@ -25,6 +25,7 @@ public class SystemMenu extends TenantEntity {
     private String component;
     private Character menuType;
     private Character visible;
+    private Integer status;
     private String perms;
     private String icon;
 }

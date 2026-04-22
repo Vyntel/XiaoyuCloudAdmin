@@ -1,16 +1,14 @@
 package com.xiaoyu.module.system.service;
 
 import com.xiaoyu.api.system.vo.UserVO;
-import com.xiaoyu.common.core.service.IBaseService;
 import com.xiaoyu.module.system.entity.SystemUser;
-import com.xiaoyu.module.system.mapper.SystemUserMapper;
 
 import java.util.List;
 
 /**
  * 系统用户 Service
  */
-public interface SystemUserService extends IBaseService<SystemUserMapper, SystemUser> {
+public interface SystemUserService {
 
     /**
      * 分页查询用户列表

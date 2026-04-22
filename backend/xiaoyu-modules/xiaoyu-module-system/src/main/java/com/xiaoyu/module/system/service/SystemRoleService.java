@@ -1,15 +1,13 @@
 package com.xiaoyu.module.system.service;
 
-import com.xiaoyu.common.core.service.IBaseService;
 import com.xiaoyu.module.system.entity.SystemRole;
-import com.xiaoyu.module.system.mapper.SystemRoleMapper;
 
 import java.util.List;
 
 /**
  * 角色Service接口
  */
-public interface SystemRoleService extends IBaseService<SystemRoleMapper, SystemRole> {
+public interface SystemRoleService {
 
     /**
      * 根据角色编码查询角色
