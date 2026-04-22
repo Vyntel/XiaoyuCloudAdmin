@@ -3,6 +3,7 @@ package com.xiaoyu.module.system.service.impl;
 import cn.hutool.crypto.digest.BCrypt;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.xiaoyu.common.core.exception.ServiceException;
+import com.xiaoyu.common.core.service.impl.BaseServiceImpl;
 import com.xiaoyu.module.system.entity.SystemUser;
 import com.xiaoyu.module.system.mapper.SystemUserMapper;
 import com.xiaoyu.module.system.service.SystemUserService;
@@ -21,9 +22,14 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SystemUserServiceImpl implements SystemUserService {
+public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, SystemUser> implements SystemUserService {
 
     private final SystemUserMapper systemUserMapper;
+
+    @Override
+    protected SystemUserMapper getMapperDelegate() {
+        return systemUserMapper;
+    }
 
     @Override
     public List<UserVO> getUserPage(Integer pageNum, Integer pageSize, String username, String nickname, Integer status, Long deptId) {
@@ -76,8 +82,6 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (existUser == null) {
             throw new ServiceException("用户不存在");
         }
-
-        // 不更新密码
         user.setPassword(null);
         systemUserMapper.update(user);
     }
@@ -99,7 +103,6 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
-        // 默认密码：123456
         user.setPassword(BCrypt.hashpw("123456"));
         systemUserMapper.update(user);
     }
@@ -111,13 +114,9 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
-
-        // 验证旧密码
         if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
             throw new ServiceException("原密码错误");
         }
-
-        // 设置新密码
         user.setPassword(BCrypt.hashpw(newPassword));
         systemUserMapper.update(user);
     }
@@ -145,9 +144,6 @@ public class SystemUserServiceImpl implements SystemUserService {
         return Collections.emptyList();
     }
 
-    /**
-     * 转换为VO
-     */
     private UserVO convertToVO(SystemUser user) {
         UserVO vo = new UserVO();
         vo.setUserId(user.getUserId());

@@ -1,4 +1,4 @@
-package com.xiaoyu.module.system.mapper;
+package com.xiaoyu.common.core.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 

@@ -1,12 +1,12 @@
 package com.xiaoyu.module.system.mapper;
 
 import com.xiaoyu.common.core.mapper.IBaseMapper;
-import com.xiaoyu.module.system.entity.SystemUser;
+import com.xiaoyu.module.system.entity.SystemRole;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 系统用户 Mapper
+ * 角色Mapper接口
  */
 @Mapper
-public interface SystemUserMapper extends IBaseMapper<SystemUser> {
+public interface SystemRoleMapper extends IBaseMapper<SystemRole> {
 }
