@@ -533,3 +533,102 @@ CREATE TABLE IF NOT EXISTS wf_history (
     KEY idx_instance_id (instance_id),
     KEY idx_operate_user_id (operate_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程历史表';
+
+-- =====================================================
+-- 即时通讯相关表
+-- =====================================================
+
+-- IM会话表
+CREATE TABLE IF NOT EXISTS im_conversation (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '会话ID',
+    type TINYINT DEFAULT 0 COMMENT '会话类型(0-单聊,1-群聊)',
+    name VARCHAR(100) DEFAULT NULL COMMENT '会话名称',
+    owner_id BIGINT DEFAULT NULL COMMENT '群主ID',
+    avatar VARCHAR(255) DEFAULT NULL COMMENT '头像',
+    last_message_id BIGINT DEFAULT NULL COMMENT '最后消息ID',
+    last_message_time DATETIME DEFAULT NULL COMMENT '��后消息时间',
+    unread_count INT DEFAULT 0 COMMENT '未读消息数',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-置顶,2-免打扰)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_owner_id (owner_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IM会话表';
+
+-- IM消息表
+CREATE TABLE IF NOT EXISTS im_message (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '消息ID',
+    conversation_id BIGINT NOT NULL COMMENT '会话ID',
+    sender_id BIGINT NOT NULL COMMENT '发送者ID',
+    sender_name VARCHAR(50) DEFAULT NULL COMMENT '发送者名称',
+    sender_avatar VARCHAR(255) DEFAULT NULL COMMENT '发送者头像',
+    msg_type TINYINT DEFAULT 0 COMMENT '消息类型(0-文本,1-图片,2-文件,3-语音,4-视频)',
+    content LONGTEXT DEFAULT NULL COMMENT '消息内容',
+    quote_id BIGINT DEFAULT NULL COMMENT '引用消息ID',
+    attachment_url VARCHAR(500) DEFAULT NULL COMMENT '附件URL',
+    attachment_name VARCHAR(200) DEFAULT NULL COMMENT '附件名称',
+    attachment_size BIGINT DEFAULT NULL COMMENT '附件大小',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-已撤回)',
+    send_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_conversation_id (conversation_id),
+    KEY idx_sender_id (sender_id),
+    KEY idx_send_time (send_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IM消息表';
+
+-- IM群组表
+CREATE TABLE IF NOT EXISTS im_group (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '群组ID',
+    name VARCHAR(100) NOT NULL COMMENT '群名称',
+    avatar VARCHAR(255) DEFAULT NULL COMMENT '群头像',
+    owner_id BIGINT NOT NULL COMMENT '群主ID',
+    announcement VARCHAR(500) DEFAULT NULL COMMENT '群公告',
+    description VARCHAR(500) DEFAULT NULL COMMENT '群描述',
+    member_count INT DEFAULT 0 COMMENT '成员数量',
+    is_all TINYINT DEFAULT 0 COMMENT '是否全员群(0-否,1-是)',
+    join_type TINYINT DEFAULT 0 COMMENT '加群方式(0-允许所有人,1-需要验证,2-禁止加入)',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-解散)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_owner_id (owner_id),
+    KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IM群组表';
+
+-- IM群组成员表
+CREATE TABLE IF NOT EXISTS im_group_member (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '成员ID',
+    group_id BIGINT NOT NULL COMMENT '群组ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    user_name VARCHAR(50) DEFAULT NULL COMMENT '用户名称',
+    user_avatar VARCHAR(255) DEFAULT NULL COMMENT '用户头像',
+    nickname VARCHAR(50) DEFAULT NULL COMMENT '群昵称',
+    role TINYINT DEFAULT 0 COMMENT '角色(0-成员,1-管理员,2-群主)',
+    join_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '入群时间',
+    last_speak_time DATETIME DEFAULT NULL COMMENT '最后发言时间',
+    mute_end_time DATETIME DEFAULT NULL COMMENT '禁言结束时间',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-退群,2-踢出)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_group_user (group_id, user_id),
+    KEY idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IM群组成员表';
