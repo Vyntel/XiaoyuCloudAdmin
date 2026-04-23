@@ -30,7 +30,7 @@ public class AiConversationServiceImpl extends ServiceImpl<AiConversationMapper,
         if (status != null) {
             wrapper.and("status = {0}", status);
         }
-        wrapper.orderByDesc("created_time");
+        wrapper.orderBy("created_time", false);
         return aiConversationMapper.selectListByQuery(wrapper);
     }
 
@@ -59,7 +59,7 @@ public class AiConversationServiceImpl extends ServiceImpl<AiConversationMapper,
     public List<AiConversation> getUserConversations(Long userId) {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("user_id = {0}", userId);
-        wrapper.orderByDesc("created_time");
+        wrapper.orderBy("created_time", false);
         return aiConversationMapper.selectListByQuery(wrapper);
     }
 }

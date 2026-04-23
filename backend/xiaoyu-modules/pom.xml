@@ -19,6 +19,8 @@
     <modules>
         <module>xiaoyu-module-system</module>
         <module>xiaoyu-module-auth</module>
+        <module>xiaoyu-module-ai</module>
+        <module>xiaoyu-module-workflow</module>
     </modules>
 
 </project>

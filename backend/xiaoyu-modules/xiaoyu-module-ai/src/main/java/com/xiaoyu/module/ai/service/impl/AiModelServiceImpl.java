@@ -22,7 +22,7 @@ public class AiModelServiceImpl extends ServiceImpl<AiModelMapper, AiModel> impl
     public List<AiModel> getEnabledModels() {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("status = 0");
-        wrapper.orderByAsc("sort");
+        wrapper.orderBy("sort", true);
         return aiModelMapper.selectListByQuery(wrapper);
     }
 

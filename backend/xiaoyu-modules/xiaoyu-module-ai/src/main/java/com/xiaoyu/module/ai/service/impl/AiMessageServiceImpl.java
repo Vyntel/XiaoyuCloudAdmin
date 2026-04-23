@@ -22,7 +22,7 @@ public class AiMessageServiceImpl extends ServiceImpl<AiMessageMapper, AiMessage
     public List<AiMessage> getMessagesByConversationId(Long conversationId) {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("conversation_id = {0}", conversationId);
-        wrapper.orderByAsc("created_time");
+        wrapper.orderBy("created_time", true);
         return aiMessageMapper.selectListByQuery(wrapper);
     }
 
@@ -46,9 +46,9 @@ public class AiMessageServiceImpl extends ServiceImpl<AiMessageMapper, AiMessage
     public List<AiMessage> getConversationHistory(Long conversationId, Integer limit) {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("conversation_id = {0}", conversationId);
-        wrapper.orderByDesc("created_time");
+        wrapper.orderBy("created_time", false);
         if (limit != null && limit > 0) {
-            wrapper.last("limit " + limit);
+            wrapper.limit(limit);
         }
         return aiMessageMapper.selectListByQuery(wrapper);
     }

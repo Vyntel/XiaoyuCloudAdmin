@@ -422,3 +422,114 @@ CREATE TABLE IF NOT EXISTS ai_knowledge (
 INSERT INTO ai_model (id, name, code, provider, description, max_tokens, temperature, sort, status, tenant_id) VALUES
 (1, 'GPT-4', 'gpt-4', 'openai', 'OpenAI GPT-4模型', 8192, 0.7, 1, 0, 1),
 (2, 'GPT-3.5 Turbo', 'gpt-3.5-turbo', 'openai', 'OpenAI GPT-3.5 Turbo模型', 4096, 0.7, 2, 0, 1);
+
+-- =====================================================
+-- 工作流相关表
+-- =====================================================
+
+-- 流程定义表
+CREATE TABLE IF NOT EXISTS wf_definition (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '定义ID',
+    process_key VARCHAR(100) NOT NULL COMMENT '流程Key',
+    name VARCHAR(100) NOT NULL COMMENT '流程名称',
+    description VARCHAR(500) DEFAULT NULL COMMENT '流程描述',
+    category VARCHAR(50) DEFAULT NULL COMMENT '流程分类',
+    bpmn_xml LONGTEXT DEFAULT NULL COMMENT 'BPMN XML内容',
+    diagram_key VARCHAR(100) DEFAULT NULL COMMENT '流程图KEY',
+    version INT DEFAULT 1 COMMENT '版本号',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-草稿,1-已部署,2-挂起)',
+    flowable_definition_id VARCHAR(100) DEFAULT NULL COMMENT 'Flowable流程定义ID',
+    deploy_time DATETIME DEFAULT NULL COMMENT '发布时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_process_key (process_key),
+    KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程定义表';
+
+-- 流程实例表
+CREATE TABLE IF NOT EXISTS wf_instance (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '实例ID',
+    definition_id BIGINT NOT NULL COMMENT '流程定义ID',
+    process_key VARCHAR(100) NOT NULL COMMENT '流程Key',
+    name VARCHAR(200) NOT NULL COMMENT '流程名称',
+    start_user_id BIGINT NOT NULL COMMENT '发起人ID',
+    start_user_name VARCHAR(50) DEFAULT NULL COMMENT '发起人名称',
+    current_node_key VARCHAR(100) DEFAULT NULL COMMENT '当前节点Key',
+    current_node_name VARCHAR(100) DEFAULT NULL COMMENT '当前节点名称',
+    form_data_id BIGINT DEFAULT NULL COMMENT '表单数据ID',
+    flowable_instance_id VARCHAR(100) DEFAULT NULL COMMENT 'Flowable流程实例ID',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-进行中,1-已完成,2-已取消,3-已驳回)',
+    start_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '开始时间',
+    end_time DATETIME DEFAULT NULL COMMENT '结束时间',
+    duration BIGINT DEFAULT NULL COMMENT '耗时(秒)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_definition_id (definition_id),
+    KEY idx_start_user_id (start_user_id),
+    KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程实例表';
+
+-- 流程任务表
+CREATE TABLE IF NOT EXISTS wf_task (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+    instance_id BIGINT NOT NULL COMMENT '流程实例ID',
+    definition_id BIGINT NOT NULL COMMENT '流程定义ID',
+    task_name VARCHAR(100) NOT NULL COMMENT '任务名称',
+    task_key VARCHAR(100) NOT NULL COMMENT '任务Key',
+    assignee_id BIGINT DEFAULT NULL COMMENT '办理人ID',
+    assignee_name VARCHAR(50) DEFAULT NULL COMMENT '办理人名称',
+    candidate_users VARCHAR(2000) DEFAULT NULL COMMENT '候选用户ID列表(JSON)',
+    candidate_roles VARCHAR(2000) DEFAULT NULL COMMENT '候选角色ID列表(JSON)',
+    form_data_id BIGINT DEFAULT NULL COMMENT '表单数据ID',
+    flowable_task_id VARCHAR(100) DEFAULT NULL COMMENT 'Flowable任务ID',
+    task_type TINYINT DEFAULT 0 COMMENT '任务类型(0-正常,1-转办,2-委托,3-加签)',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-待处理,1-已完成,2-已取消)',
+    priority TINYINT DEFAULT 0 COMMENT '优先级(0-普通,1-紧急,2-加急)',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    complete_time DATETIME DEFAULT NULL COMMENT '完成时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_instance_id (instance_id),
+    KEY idx_assignee_id (assignee_id),
+    KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程任务表';
+
+-- 流程历史表
+CREATE TABLE IF NOT EXISTS wf_history (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '历史ID',
+    instance_id BIGINT NOT NULL COMMENT '流程实例ID',
+    task_id BIGINT DEFAULT NULL COMMENT '任务ID',
+    definition_id BIGINT NOT NULL COMMENT '流程定义ID',
+    definition_version INT DEFAULT NULL COMMENT '流程定义版本',
+    node_key VARCHAR(100) DEFAULT NULL COMMENT '节点Key',
+    node_name VARCHAR(100) DEFAULT NULL COMMENT '节点名称',
+    operate_type TINYINT DEFAULT 0 COMMENT '操作类型(0-提交,1-同意,2-拒绝,3-转办,4-委托,5-退回,6-撤回,7-终止)',
+    operate_user_id BIGINT NOT NULL COMMENT '操作人ID',
+    operate_user_name VARCHAR(50) DEFAULT NULL COMMENT '操作人名称',
+    comment VARCHAR(500) DEFAULT NULL COMMENT '审批意见',
+    operate_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+    instance_status TINYINT DEFAULT NULL COMMENT '流程实例状态',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_instance_id (instance_id),
+    KEY idx_operate_user_id (operate_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程历史表';

@@ -27,7 +27,7 @@ public class AiKnowledgeServiceImpl extends ServiceImpl<AiKnowledgeMapper, AiKno
         if (status != null) {
             wrapper.and("status = {0}", status);
         }
-        wrapper.orderByDesc("created_time");
+        wrapper.orderBy("created_time", false);
         return aiKnowledgeMapper.selectListByQuery(wrapper);
     }
 
@@ -56,7 +56,7 @@ public class AiKnowledgeServiceImpl extends ServiceImpl<AiKnowledgeMapper, AiKno
     public List<AiKnowledge> getEnabledList() {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("status = 0");
-        wrapper.orderByDesc("created_time");
+        wrapper.orderBy("created_time", false);
         return aiKnowledgeMapper.selectListByQuery(wrapper);
     }
 }
