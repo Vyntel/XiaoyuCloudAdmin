@@ -333,3 +333,92 @@ INSERT INTO sys_config (config_key, config_value, config_type, is_public, status
 ('sys.index.topbarStatus', '0', 'N', 1, 0, 1),
 ('sys.account.captchaStatus', '0', 'N', 1, 0, 1),
 ('sys.account.registerStatus', '0', 'N', 1, 0, 1);
+
+-- =====================================================
+-- AI模块相关表
+-- =====================================================
+
+-- AI模型表
+CREATE TABLE IF NOT EXISTS ai_model (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '模型ID',
+    name VARCHAR(100) NOT NULL COMMENT '模型名称',
+    code VARCHAR(100) NOT NULL COMMENT '模型编码',
+    provider VARCHAR(50) NOT NULL COMMENT '供应商(openai/anthropic/google/azure等)',
+    model_id VARCHAR(200) DEFAULT NULL COMMENT '供应商模型ID',
+    api_key VARCHAR(500) DEFAULT NULL COMMENT 'API Key',
+    api_base VARCHAR(200) DEFAULT NULL COMMENT 'API地址',
+    api_version VARCHAR(50) DEFAULT NULL COMMENT 'API版本',
+    icon VARCHAR(255) DEFAULT NULL COMMENT '模型图标',
+    description VARCHAR(500) DEFAULT NULL COMMENT '模型描述',
+    max_tokens INT DEFAULT 4096 COMMENT '最大Token',
+    temperature DECIMAL(3,2) DEFAULT 0.7 COMMENT '默认温度',
+    sort INT DEFAULT 0 COMMENT '显示顺序',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-禁用)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_code (code, tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI模型表';
+
+-- AI会话表
+CREATE TABLE IF NOT EXISTS ai_conversation (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '会话ID',
+    title VARCHAR(200) NOT NULL COMMENT '会话标题',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    model_code VARCHAR(100) DEFAULT NULL COMMENT 'AI模型编码',
+    knowledge_id BIGINT DEFAULT NULL COMMENT '知识库ID',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-已归档)',
+    message_count INT DEFAULT 0 COMMENT '消息数量',
+    last_message_time DATETIME DEFAULT NULL COMMENT '最后消息时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI会话表';
+
+-- AI消息表
+CREATE TABLE IF NOT EXISTS ai_message (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '消息ID',
+    conversation_id BIGINT NOT NULL COMMENT '会话ID',
+    role VARCHAR(20) NOT NULL COMMENT '角色(user/assistant/system)',
+    content LONGTEXT NOT NULL COMMENT '消息内容',
+    model_code VARCHAR(100) DEFAULT NULL COMMENT '模型编码',
+    model_response TEXT DEFAULT NULL COMMENT '模型响应',
+    tokens INT DEFAULT NULL COMMENT '消耗Token',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-失败)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (id),
+    KEY idx_conversation_id (conversation_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI消息表';
+
+-- AI知识库表
+CREATE TABLE IF NOT EXISTS ai_knowledge (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '知识库ID',
+    name VARCHAR(100) NOT NULL COMMENT '知识库名称',
+    description VARCHAR(500) DEFAULT NULL COMMENT '知识库描述',
+    file_url VARCHAR(500) DEFAULT NULL COMMENT '文件地址',
+    file_count INT DEFAULT 0 COMMENT '文件数量',
+    word_count INT DEFAULT 0 COMMENT '词数',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-禁用)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI知识库表';
+
+-- 初始化默认AI模型
+INSERT INTO ai_model (id, name, code, provider, description, max_tokens, temperature, sort, status, tenant_id) VALUES
+(1, 'GPT-4', 'gpt-4', 'openai', 'OpenAI GPT-4模型', 8192, 0.7, 1, 0, 1),
+(2, 'GPT-3.5 Turbo', 'gpt-3.5-turbo', 'openai', 'OpenAI GPT-3.5 Turbo模型', 4096, 0.7, 2, 0, 1);
