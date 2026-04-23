@@ -23,6 +23,7 @@
         <module>xiaoyu-module-workflow</module>
         <module>xiaoyu-module-im</module>
         <module>xiaoyu-module-file</module>
+        <module>xiaoyu-module-report</module>
     </modules>
 
 </project>

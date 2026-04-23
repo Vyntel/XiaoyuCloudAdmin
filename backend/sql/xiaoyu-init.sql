@@ -684,3 +684,25 @@ CREATE TABLE IF NOT EXISTS file_folder (
     PRIMARY KEY (id),
     KEY idx_parent_id (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件夹表';
+
+-- =====================================================
+-- 报表服务相关表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS report_definition (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '报表ID',
+    name VARCHAR(100) NOT NULL COMMENT '报表名称',
+    code VARCHAR(100) NOT NULL COMMENT '报表编码',
+    description VARCHAR(500) DEFAULT NULL COMMENT '报表描述',
+    sql_content LONGTEXT DEFAULT NULL COMMENT 'SQL查询语句',
+    config_json LONGTEXT DEFAULT NULL COMMENT '配置JSON',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-禁用)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_code (code, tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='报表定义表';
