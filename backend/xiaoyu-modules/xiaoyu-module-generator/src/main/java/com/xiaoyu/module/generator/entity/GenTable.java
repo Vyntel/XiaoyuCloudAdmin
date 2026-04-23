@@ -5,6 +5,7 @@ import com.xiaoyu.common.core.entity.TenantEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,4 +22,5 @@ public class GenTable extends TenantEntity implements Serializable {
     private String functionAuthor;
     private String templatePath;
     private Integer status;
+    private List<GenTableColumn> columns;
 }

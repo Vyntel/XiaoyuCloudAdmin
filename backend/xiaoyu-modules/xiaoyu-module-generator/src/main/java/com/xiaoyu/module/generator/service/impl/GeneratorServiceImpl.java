@@ -4,6 +4,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.xiaoyu.module.generator.entity.GenTable;
 import com.xiaoyu.module.generator.mapper.GenTableMapper;
+import com.xiaoyu.module.generator.service.GeneratorColumnService;
 import com.xiaoyu.module.generator.service.GeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GeneratorServiceImpl extends ServiceImpl<GenTableMapper, GenTable> implements GeneratorService {
     private final GenTableMapper genTableMapper;
+    private final GeneratorColumnService generatorColumnService;
 
     @Override
     public List<GenTable> getTablePage(Integer pageNum, Integer pageSize, String tableName) {
@@ -29,6 +31,11 @@ public class GeneratorServiceImpl extends ServiceImpl<GenTableMapper, GenTable> 
     @Override
     public GenTable getTableById(Long id) {
         return genTableMapper.selectOneById(id);
+    }
+
+    @Override
+    public GenTable getTableWithColumns(Long id) {
+        return generatorColumnService.getTableWithColumns(id);
     }
 
     @Override

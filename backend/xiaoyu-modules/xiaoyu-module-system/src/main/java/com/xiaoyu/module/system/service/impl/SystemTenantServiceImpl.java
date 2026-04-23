@@ -28,7 +28,7 @@ public class SystemTenantServiceImpl extends ServiceImpl<SystemTenantMapper, Sys
         if (status != null) {
             wrapper.and("status = {0}", status);
         }
-        wrapper.orderByDesc("id");
+        wrapper.orderBy("id", false);
         Page<SystemTenant> page = systemTenantMapper.paginate(pageNum, pageSize, wrapper);
         return page.getRecords();
     }
@@ -37,7 +37,7 @@ public class SystemTenantServiceImpl extends ServiceImpl<SystemTenantMapper, Sys
     public List<SystemTenant> getEnabledTenants() {
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where("status = 0");
-        wrapper.orderByAsc("sort");
+        wrapper.orderBy("sort", true);
         return systemTenantMapper.selectListByQuery(wrapper);
     }
 

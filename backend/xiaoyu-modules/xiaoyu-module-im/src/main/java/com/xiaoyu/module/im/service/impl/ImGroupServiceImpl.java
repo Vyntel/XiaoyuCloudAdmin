@@ -132,4 +132,34 @@ public class ImGroupServiceImpl extends ServiceImpl<ImGroupMapper, ImGroup> impl
 
         return members.stream().map(m -> imGroupMapper.selectOneById(m.getGroupId())).toList();
     }
+
+    @Override
+    public boolean muteMember(Long memberId, Date muteEndTime) {
+        ImGroupMember member = imGroupMemberMapper.selectOneById(memberId);
+        if (member != null) {
+            member.setMuteEndTime(muteEndTime);
+            return imGroupMemberMapper.update(member) > 0;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean unmuteMember(Long memberId) {
+        ImGroupMember member = imGroupMemberMapper.selectOneById(memberId);
+        if (member != null) {
+            member.setMuteEndTime(null);
+            return imGroupMemberMapper.update(member) > 0;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateMemberNickname(Long memberId, String nickname) {
+        ImGroupMember member = imGroupMemberMapper.selectOneById(memberId);
+        if (member != null) {
+            member.setNickname(nickname);
+            return imGroupMemberMapper.update(member) > 0;
+        }
+        return false;
+    }
 }

@@ -32,6 +32,12 @@ public class GeneratorController {
         return Result.success(generatorService.getTableById(id));
     }
 
+    @Operation(summary = "获取表及其字段")
+    @GetMapping("/{id}/columns")
+    public Result<GenTable> getTableWithColumns(@PathVariable("id") Long id) {
+        return Result.success(generatorService.getTableWithColumns(id));
+    }
+
     @Operation(summary = "创建表")
     @PostMapping("/table")
     public Result<Long> createTable(@RequestBody GenTable table) {

@@ -2,6 +2,8 @@ package com.xiaoyu.module.im.service;
 
 import com.xiaoyu.module.im.entity.ImGroup;
 import com.xiaoyu.module.im.entity.ImGroupMember;
+
+import java.util.Date;
 import java.util.List;
 
 public interface ImGroupService {
@@ -27,4 +29,10 @@ public interface ImGroupService {
     List<ImGroupMember> getGroupMembers(Long groupId);
 
     List<ImGroup> getUserGroups(Long userId);
+
+    boolean muteMember(Long memberId, Date muteEndTime);
+
+    boolean unmuteMember(Long memberId);
+
+    boolean updateMemberNickname(Long memberId, String nickname);
 }

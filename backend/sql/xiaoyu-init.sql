@@ -760,6 +760,52 @@ CREATE TABLE IF NOT EXISTS gen_table (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表';
 
+CREATE TABLE IF NOT EXISTS gen_table_column (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '字段ID',
+    table_id BIGINT NOT NULL COMMENT '所属表ID',
+    column_name VARCHAR(100) NOT NULL COMMENT '字段名称',
+    column_comment VARCHAR(200) DEFAULT NULL COMMENT '字段注释',
+    column_type VARCHAR(50) DEFAULT NULL COMMENT '字段类型',
+    java_type VARCHAR(100) DEFAULT NULL COMMENT 'Java类型',
+    java_field VARCHAR(100) DEFAULT NULL COMMENT 'Java字段名',
+    is_pk TINYINT DEFAULT 0 COMMENT '是否主键(0-否,1-是)',
+    is_increment TINYINT DEFAULT 0 COMMENT '是否自增(0-否,1-是)',
+    is_required TINYINT DEFAULT 0 COMMENT '是否必填(0-否,1-是)',
+    is_insert TINYINT DEFAULT 0 COMMENT '是否为插入字段(0-否,1-是)',
+    is_edit TINYINT DEFAULT 0 COMMENT '是否编辑字段(0-否,1-是)',
+    is_list TINYINT DEFAULT 0 COMMENT '是否列表字段(0-否,1-是)',
+    is_query TINYINT DEFAULT 0 COMMENT '是否查询字段(0-否,1-是)',
+    query_type VARCHAR(50) DEFAULT 'EQ' COMMENT '查询方式(EQ/NE/LIKE/GT/LT/BETWEEN)',
+    html_type VARCHAR(50) DEFAULT NULL COMMENT '前端组件类型(input/select/radio/checkbox/datetime/editor)',
+    dict_type VARCHAR(100) DEFAULT NULL COMMENT '字典类型',
+    sort INT DEFAULT 0 COMMENT '排序',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_table_id (table_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成字段表';
+
+-- =====================================================
+-- 登录日志表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS sys_login_log (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+    user_id BIGINT DEFAULT NULL COMMENT '用户ID',
+    username VARCHAR(50) DEFAULT NULL COMMENT '用户名',
+    ip VARCHAR(50) DEFAULT NULL COMMENT 'IP地址',
+    location VARCHAR(100) DEFAULT NULL COMMENT '登录地点',
+    browser VARCHAR(100) DEFAULT NULL COMMENT '浏览器',
+    os VARCHAR(100) DEFAULT NULL COMMENT '操作系统',
+    status TINYINT DEFAULT 0 COMMENT '登录状态(0-成功,1-失败)',
+    msg VARCHAR(500) DEFAULT NULL COMMENT '提示消息',
+    login_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '登录时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    PRIMARY KEY (id),
+    KEY idx_user_id (user_id),
+    KEY idx_login_time (login_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统登录日志表';
+
 -- =====================================================
 -- 定时任务相关表
 -- =====================================================

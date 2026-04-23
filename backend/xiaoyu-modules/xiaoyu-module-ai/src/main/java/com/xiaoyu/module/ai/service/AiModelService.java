@@ -34,4 +34,19 @@ public interface AiModelService extends IService<AiModel> {
      * 删除模型
      */
     boolean deleteModel(Long id);
+
+    /**
+     * 分页查询模型列表
+     */
+    List<AiModel> getModelPage(Integer pageNum, Integer pageSize, String name, String provider, Integer status);
+
+    /**
+     * 根据ID获取模型
+     */
+    AiModel getModelById(Long id);
+
+    /**
+     * 修改模型状态
+     */
+    boolean updateModelStatus(Long id, Integer status);
 }
