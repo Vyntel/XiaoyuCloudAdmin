@@ -632,3 +632,55 @@ CREATE TABLE IF NOT EXISTS im_group_member (
     UNIQUE KEY uk_group_user (group_id, user_id),
     KEY idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='IM群组成员表';
+
+-- =====================================================
+-- 文件存储相关表
+-- =====================================================
+
+-- 文件信息表
+CREATE TABLE IF NOT EXISTS file_info (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '文件ID',
+    file_name VARCHAR(200) NOT NULL COMMENT '文件名称',
+    file_path VARCHAR(500) DEFAULT NULL COMMENT '文件路径',
+    file_url VARCHAR(500) DEFAULT NULL COMMENT '文件URL',
+    file_size BIGINT DEFAULT NULL COMMENT '文件大小(字节)',
+    file_type VARCHAR(50) DEFAULT NULL COMMENT '文件类型',
+    mime_type VARCHAR(100) DEFAULT NULL COMMENT 'MIME类型',
+    storage_type VARCHAR(20) DEFAULT 'local' COMMENT '存储引擎(local/minio/oss/cos)',
+    bucket_name VARCHAR(100) DEFAULT NULL COMMENT '存储桶/目录',
+    file_key VARCHAR(100) DEFAULT NULL COMMENT '唯一标识符',
+    upload_user_id BIGINT DEFAULT NULL COMMENT '上传者ID',
+    upload_user_name VARCHAR(50) DEFAULT NULL COMMENT '上传者名称',
+    folder_id BIGINT DEFAULT NULL COMMENT '文件夹ID',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-删除)',
+    upload_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_folder_id (folder_id),
+    KEY idx_upload_user_id (upload_user_id),
+    KEY idx_storage_type (storage_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件信息表';
+
+-- 文件夹表
+CREATE TABLE IF NOT EXISTS file_folder (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '文件夹ID',
+    name VARCHAR(100) NOT NULL COMMENT '文件夹名称',
+    parent_id BIGINT DEFAULT 0 COMMENT '父文件夹ID',
+    parent_path VARCHAR(500) DEFAULT '0' COMMENT '父级路径',
+    storage_type VARCHAR(20) DEFAULT 'local' COMMENT '存储类型',
+    file_count INT DEFAULT 0 COMMENT '文件数量',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-删除)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志(0-未删除,1-已删除)',
+    PRIMARY KEY (id),
+    KEY idx_parent_id (parent_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件夹表';

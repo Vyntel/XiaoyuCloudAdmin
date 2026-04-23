@@ -22,6 +22,7 @@
         <module>xiaoyu-module-ai</module>
         <module>xiaoyu-module-workflow</module>
         <module>xiaoyu-module-im</module>
+        <module>xiaoyu-module-file</module>
     </modules>
 
 </project>
