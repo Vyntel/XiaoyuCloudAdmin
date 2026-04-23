@@ -24,6 +24,9 @@
         <module>xiaoyu-module-im</module>
         <module>xiaoyu-module-file</module>
         <module>xiaoyu-module-report</module>
+        <module>xiaoyu-module-monitor</module>
+        <module>xiaoyu-module-generator</module>
+        <module>xiaoyu-module-job</module>
     </modules>
 
 </project>

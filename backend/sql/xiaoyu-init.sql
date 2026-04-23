@@ -706,3 +706,80 @@ CREATE TABLE IF NOT EXISTS report_definition (
     PRIMARY KEY (id),
     UNIQUE KEY uk_code (code, tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='报表定义表';
+
+-- =====================================================
+-- 系统监控相关表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS sys_log (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+    module VARCHAR(50) DEFAULT NULL COMMENT '模块名',
+    biz_type VARCHAR(50) DEFAULT NULL COMMENT '业务类型',
+    user_id BIGINT DEFAULT NULL COMMENT '用户ID',
+    user_name VARCHAR(50) DEFAULT NULL COMMENT '用户名',
+    method VARCHAR(200) DEFAULT NULL COMMENT '请求方法',
+    url VARCHAR(500) DEFAULT NULL COMMENT '请求地址',
+    ip VARCHAR(50) DEFAULT NULL COMMENT 'IP地址',
+    location VARCHAR(100) DEFAULT NULL COMMENT '操作地点',
+    params TEXT DEFAULT NULL COMMENT '请求参数',
+    result TEXT DEFAULT NULL COMMENT '返回结果',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-成功,1-失败)',
+    duration BIGINT DEFAULT NULL COMMENT '耗时(毫秒)',
+    error_msg TEXT DEFAULT NULL COMMENT '错误信息',
+    trace_id VARCHAR(100) DEFAULT NULL COMMENT '追踪ID',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志',
+    PRIMARY KEY (id),
+    KEY idx_user_id (user_id),
+    KEY idx_create_time (create_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统日志表';
+
+-- =====================================================
+-- 代码生成相关表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS gen_table (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '表ID',
+    table_name VARCHAR(100) NOT NULL COMMENT '表名称',
+    table_comment VARCHAR(200) DEFAULT NULL COMMENT '表描述',
+    class_name VARCHAR(100) DEFAULT NULL COMMENT '实体类名',
+    package_name VARCHAR(100) DEFAULT NULL COMMENT '包名',
+    module_name VARCHAR(50) DEFAULT NULL COMMENT '模块名',
+    business_name VARCHAR(50) DEFAULT NULL COMMENT '业务名',
+    function_name VARCHAR(50) DEFAULT NULL COMMENT '功能名',
+    function_author VARCHAR(50) DEFAULT NULL COMMENT '功能作者',
+    template_path VARCHAR(200) DEFAULT NULL COMMENT '模板路径',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-正常,1-禁用)',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志',
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代码生成表';
+
+-- =====================================================
+-- 定时任务相关表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS sys_job (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+    job_name VARCHAR(100) NOT NULL COMMENT '任务名称',
+    job_group VARCHAR(100) DEFAULT 'DEFAULT' COMMENT '任务组名',
+    job_handler VARCHAR(100) DEFAULT NULL COMMENT '任务处理器',
+    cron_expression VARCHAR(100) DEFAULT NULL COMMENT 'Cron表达式',
+    misfire_policy INT DEFAULT 0 COMMENT '失败策略',
+    concurrent INT DEFAULT 1 COMMENT '是否并发(0-否,1-是)',
+    param_json TEXT DEFAULT NULL COMMENT '参数JSON',
+    status TINYINT DEFAULT 0 COMMENT '状态(0-停止,1-运行)',
+    description VARCHAR(500) DEFAULT NULL COMMENT '任务描述',
+    tenant_id BIGINT DEFAULT 1 COMMENT '租户ID',
+    create_by VARCHAR(50) DEFAULT NULL COMMENT '创建者',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) DEFAULT NULL COMMENT '更新者',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标志',
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='定时任务表';
