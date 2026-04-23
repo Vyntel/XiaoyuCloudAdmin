@@ -6,17 +6,19 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统岗位实体
+ * 字典类型实体
+ * 对应表: sys_dict_type
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Table("sys_post")
-public class SystemPost extends TenantEntity {
+@Table("sys_dict_type")
+public class SystemDictType extends TenantEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /** 字典名称 */
+    private String name;
 
-    private String postCode;
-    private String postName;
-    private Integer postSort;
+    /** 字典编码 */
+    private String code;
 }

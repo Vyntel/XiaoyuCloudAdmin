@@ -1,0 +1,224 @@
+// 未来科技主题 - 深空蓝与霓虹绿
+:root {
+  // 主色调 - 深空蓝渐变
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-color: #667eea;
+  --primary-hover: #5a6fd8;
+  --primary-light: #8b9bf8;
+
+  // 辅助色 - 霓虹绿
+  --accent-color: #00ff88;
+  --accent-hover: #00e67a;
+  --accent-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+
+  // 危险色 - 霓虹红
+  --danger-color: #ff4757;
+  --danger-glow: 0 0 20px rgba(255, 71, 87, 0.3);
+
+  // 警告色 - 霓虹橙
+  --warning-color: #ffa502;
+  --warning-glow: 0 0 20px rgba(255, 165, 2, 0.3);
+
+  // 成功色 - 霓虹青
+  --success-color: #2ed573;
+  --success-glow: 0 0 20px rgba(46, 213, 115, 0.3);
+
+  // 信息色 - 霓虹蓝
+  --info-color: #3742fa;
+  --info-glow: 0 0 20px rgba(55, 66, 250, 0.3);
+
+  // 背景色 - 深空渐变
+  --bg-primary: linear-gradient(135deg, #0c0c0c 0%, #1a1a2a 50%, #16213e 100%);
+  --bg-secondary: linear-gradient(135deg, #1e1e30 0%, #2a2a40 100%);
+  --bg-tertiary: linear-gradient(135deg, #2d2d47 0%, #3a3a5c 100%);
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-overlay: rgba(0, 0, 0, 0.8);
+
+  // 文本色
+  --text-primary: #ffffff;
+  --text-secondary: #b8c5d6;
+  --text-tertiary: #8892a0;
+  --text-muted: #6b7280;
+
+  // 边框
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
+
+  // 阴影
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
+
+  // 布局尺寸
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --header-height: 70px;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-lg: 16px;
+
+  // 动画时长
+  --transition-fast: 0.15s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+}
+
+// 导入字体 - 科技感字体组合
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+// 重置样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  background-attachment: fixed;
+  line-height: 1.6;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 滚动条 - 科技风格
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 4px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primary-hover), var(--accent-hover));
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+// 全局动画
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(102, 126, 234, 0.6);
+  }
+}
+
+// 按钮发光效果
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left var(--transition-normal);
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// 卡片悬停效果
+.card-hover {
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-color);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--primary-color);
+  }
+}
+
+// 工具类
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+}

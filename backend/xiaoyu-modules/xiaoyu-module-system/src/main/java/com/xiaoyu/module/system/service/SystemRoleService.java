@@ -34,4 +34,49 @@ public interface SystemRoleService extends IService<SystemRole> {
      * 根据状态查询角色列表
      */
     List<SystemRole> selectByStatus(Integer status);
+
+    /**
+     * 分页查询角色列表
+     */
+    List<SystemRole> getRolePage(Integer pageNum, Integer pageSize, String name, String code, Integer status);
+
+    /**
+     * 根据ID获取角色
+     */
+    SystemRole getRoleById(Long roleId);
+
+    /**
+     * 新增角色
+     */
+    Long createRole(SystemRole role);
+
+    /**
+     * 修改角色
+     */
+    void updateRole(SystemRole role);
+
+    /**
+     * 删除角色
+     */
+    void deleteRole(Long roleId);
+
+    /**
+     * 分配菜单权限
+     */
+    void assignMenus(Long roleId, List<Long> menuIds);
+
+    /**
+     * 获取角色菜单ID列表
+     */
+    List<Long> getRoleMenuIds(Long roleId);
+
+    /**
+     * 获取所有角色列表
+     */
+    List<SystemRole> getRoleList();
+
+    /**
+     * 修改角色状态
+     */
+    void updateRoleStatus(Long roleId, Integer status);
 }

@@ -22,11 +22,11 @@ import org.springframework.context.annotation.Bean;
 public class SwaggerAutoConfiguration {
 
     public SwaggerAutoConfiguration(SwaggerProperties swaggerProperties) {
-        log.info("╔═════════════════════════════════���═════════════════════════════╗");
+        log.info("╔════════════════════════════════════════════════════════════╗");
         log.info("║          小羽快速开发框架 - Swagger 配置已加载                 ║");
-        log.info("║  Swagger Enabled: {}                                      ║", swaggerProperties.isEnabled());
-        log.info("║  API Title: {}                                             ║", swaggerProperties.getTitle());
-        log.info("╚═══════════════════════════════════════════════════════════════╝");
+        log.info("║         Swagger Enabled: {}                                      ║", swaggerProperties.isEnabled());
+        log.info("║         API Title: {}                                             ║", swaggerProperties.getTitle());
+        log.info("╚══════════════════════════════════════════════════════════════╝");
     }
 
     /**

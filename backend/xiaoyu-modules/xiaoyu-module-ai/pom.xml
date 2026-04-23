@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.xiaoyu</groupId>
+        <artifactId>xiaoyu-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>xiaoyu-module-ai</artifactId>
+
+    <name>xiaoyu-module-ai</name>
+    <description>AI智能助手业务模块</description>
+
+    <dependencies>
+        <!-- 引入公共模块 -->
+        <dependency>
+            <groupId>com.xiaoyu</groupId>
+            <artifactId>xiaoyu-common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xiaoyu</groupId>
+            <artifactId>xiaoyu-common-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xiaoyu</groupId>
+            <artifactId>xiaoyu-common-swagger</artifactId>
+        </dependency>
+
+        <!-- 引入API模块 -->
+        <dependency>
+            <groupId>com.xiaoyu</groupId>
+            <artifactId>xiaoyu-api-ai</artifactId>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring AI -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+            <version>1.0.0-M4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-vector-store</artifactId>
+            <version>1.0.0-M4</version>
+        </dependency>
+
+        <!-- Redis for vector storage -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- MyBatis-Flex -->
+        <dependency>
+            <groupId>com.mybatis-flex</groupId>
+            <artifactId>mybatis-flex-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

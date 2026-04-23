@@ -1,12 +1,15 @@
 package com.xiaoyu.module.system.service.impl;
 
 import cn.hutool.crypto.digest.BCrypt;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.xiaoyu.common.core.utils.XiaoYuBeanUtil;
 import com.xiaoyu.common.core.utils.XiaoYuThrowUtil;
 import com.xiaoyu.module.system.entity.SystemUser;
+import com.xiaoyu.module.system.entity.SystemUserRole;
 import com.xiaoyu.module.system.mapper.SystemUserMapper;
+import com.xiaoyu.module.system.mapper.SystemUserRoleMapper;
 import com.xiaoyu.module.system.service.SystemUserService;
 import com.xiaoyu.api.system.vo.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,10 +26,21 @@ import java.util.List;
 public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemUser> implements SystemUserService {
 
     private final SystemUserMapper systemUserMapper;
+    private final SystemUserRoleMapper systemUserRoleMapper;
 
     @Override
     public List<UserVO> getUserPage(Integer pageNum, Integer pageSize, String username, String nickname, Integer status, Long deptId) {
-        return Collections.emptyList();
+        QueryWrapper q = QueryWrapper.create()
+                .like("username", username)
+                .like("nickname", nickname)
+                .eq("status", status)
+                .eq("dept_id", deptId)
+                .orderBy("create_time", false);
+        
+        Page<SystemUser> page = systemUserMapper.paginate(pageNum, pageSize, q);
+        return page.getRecords().stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -66,7 +80,12 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
     @Override
     @Transactional
     public void deleteUser(Long userId) {
-        XiaoYuThrowUtil.throwIfNull(systemUserMapper.selectOneById(userId), "用户不存在");
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
+        // 删除用户角色关联
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        systemUserRoleMapper.deleteByQuery(q);
+        // 逻辑删除用户
         systemUserMapper.deleteById(userId);
     }
 
@@ -100,11 +119,27 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
 
     @Override
     @Transactional
-    public void assignRoles(Long userId, List<Long> roleIds) {}
+    public void assignRoles(Long userId, List<Long> roleIds) {
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
+        // 删除旧关联
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        systemUserRoleMapper.deleteByQuery(q);
+        // 插入新关联
+        for (Long roleId : roleIds) {
+            SystemUserRole ur = new SystemUserRole();
+            ur.setUserId(userId);
+            ur.setRoleId(roleId);
+            systemUserRoleMapper.insert(ur);
+        }
+        log.info("用户ID: {} 角色分配完成，共 {} 个角色", userId, roleIds.size());
+    }
 
     @Override
     public List<Long> getUserRoleIds(Long userId) {
-        return Collections.emptyList();
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        List<SystemUserRole> list = systemUserRoleMapper.selectListByQuery(q);
+        return list.stream().map(SystemUserRole::getRoleId).collect(Collectors.toList());
     }
 
     private UserVO convertToVO(SystemUser user) {
