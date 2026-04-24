@@ -1,0 +1,42 @@
+server:
+  port: 8210
+
+spring:
+  application:
+    name: xiaoyu-module-job
+  profiles:
+    active: dev
+  config:
+    import: nacos:application-${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  cloud:
+    nacos:
+      server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      config:
+        group: DEFAULT_GROUP
+        file-extension: yml
+      discovery:
+        group: DEFAULT_GROUP
+
+# MyBatis-Flex
+mybatis-flex:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

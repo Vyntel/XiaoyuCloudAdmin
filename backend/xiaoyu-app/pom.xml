@@ -25,6 +25,10 @@
             <groupId>com.xiaoyu</groupId>
             <artifactId>xiaoyu-module-auth</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.xiaoyu</groupId>
+            <artifactId>xiaoyu-module-workflow</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>

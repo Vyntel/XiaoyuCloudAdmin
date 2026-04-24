@@ -13,6 +13,16 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  # Nacos配置(单体模式关闭)
+  cloud:
+    nacos:
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+      discovery:
+        enabled: false
+
 
 # 小羽框架配置
 xiaoyu:

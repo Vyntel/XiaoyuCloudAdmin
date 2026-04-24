@@ -1,0 +1,47 @@
+server:
+  port: 8209
+
+spring:
+  application:
+    name: xiaoyu-module-monitor
+  profiles:
+    active: dev
+  config:
+    import: nacos:application-${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  cloud:
+    nacos:
+      server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      config:
+        group: DEFAULT_GROUP
+        file-extension: yml
+      discovery:
+        group: DEFAULT_GROUP
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+# MyBatis-Flex
+mybatis-flex:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

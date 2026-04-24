@@ -349,6 +349,11 @@
                 <artifactId>xiaoyu-module-auth</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.xiaoyu</groupId>
+                <artifactId>xiaoyu-module-workflow</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
