@@ -61,4 +61,18 @@ public class ImGroupMemberController {
         List<ImGroup> list = imGroupService.getUserGroups(userId);
         return Result.success(list);
     }
+
+    @Operation(summary = "添加群成员")
+    @PostMapping
+    public Result<Long> addMember(@RequestBody ImGroupMember member) {
+        imGroupMemberMapper.insert(member, true);
+        return Result.success(member.getId());
+    }
+
+    @Operation(summary = "移除群成员")
+    @DeleteMapping("/{memberId}")
+    public Result<Boolean> removeMember(@PathVariable("memberId") Long memberId) {
+        int rows = imGroupMemberMapper.deleteById(memberId);
+        return Result.success(rows > 0);
+    }
 }

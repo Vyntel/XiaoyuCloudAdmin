@@ -36,4 +36,19 @@ public class GeneratorColumnController {
         int count = generatorColumnService.batchInsert(columns);
         return Result.success(count);
     }
+
+    @Operation(summary = "更新字段")
+    @PutMapping("/{id}")
+    public Result<Boolean> updateColumn(@PathVariable("id") Long id, @RequestBody GenTableColumn column) {
+        column.setId(id);
+        Boolean result = generatorColumnService.updateColumn(column);
+        return Result.success(result);
+    }
+
+    @Operation(summary = "删除字段")
+    @DeleteMapping("/single/{id}")
+    public Result<Boolean> deleteColumn(@PathVariable("id") Long id) {
+        Boolean result = generatorColumnService.deleteColumn(id);
+        return Result.success(result);
+    }
 }

@@ -51,6 +51,12 @@ public class GeneratorController {
         return Result.success(generatorService.deleteTable(id));
     }
 
+    @Operation(summary = "更新表")
+    @PutMapping("/table")
+    public Result<Boolean> updateTable(@RequestBody GenTable table) {
+        return Result.success(generatorService.updateTable(table));
+    }
+
     @Operation(summary = "生成代码")
     @PostMapping("/code/{id}")
     public Result<String> generateCode(@PathVariable("id") Long id) {

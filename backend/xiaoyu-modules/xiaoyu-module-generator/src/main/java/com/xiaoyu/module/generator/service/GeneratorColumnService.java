@@ -7,6 +7,8 @@ import java.util.List;
 public interface GeneratorColumnService {
     List<GenTableColumn> getColumnsByTableId(Long tableId);
     boolean deleteColumnsByTableId(Long tableId);
+    boolean deleteColumn(Long id);
     int batchInsert(List<GenTableColumn> columns);
+    boolean updateColumn(GenTableColumn column);
     GenTable getTableWithColumns(Long id);
 }

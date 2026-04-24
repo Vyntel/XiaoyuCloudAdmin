@@ -51,6 +51,11 @@ public class GeneratorServiceImpl extends ServiceImpl<GenTableMapper, GenTable> 
     }
 
     @Override
+    public boolean updateTable(GenTable table) {
+        return genTableMapper.update(table) > 0;
+    }
+
+    @Override
     public String generateCode(Long id) {
         return "code generated";
     }

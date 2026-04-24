@@ -15,6 +15,8 @@ public interface FileService {
 
     boolean batchDelete(List<Long> ids);
 
+    boolean updateFile(FileInfo fileInfo);
+
     String getFileUrl(Long id);
 
     Long copyFile(Long id, Long targetFolderId);

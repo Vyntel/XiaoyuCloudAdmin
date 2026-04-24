@@ -8,6 +8,7 @@ public interface GeneratorService {
     GenTable getTableById(Long id);
     GenTable getTableWithColumns(Long id);
     Long createTable(GenTable table);
+    boolean updateTable(GenTable table);
     boolean deleteTable(Long id);
     String generateCode(Long id);
 }

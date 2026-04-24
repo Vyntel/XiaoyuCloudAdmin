@@ -65,6 +65,13 @@ public class FileController {
         return Result.success(success);
     }
 
+    @Operation(summary = "更新文件信息")
+    @PutMapping
+    public Result<Boolean> updateFile(@RequestBody FileInfo fileInfo) {
+        Boolean success = fileService.updateFile(fileInfo);
+        return Result.success(success);
+    }
+
     @Operation(summary = "获取文件URL")
     @GetMapping("/{id}/url")
     public Result<String> getFileUrl(@PathVariable("id") Long id) {

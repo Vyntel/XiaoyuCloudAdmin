@@ -68,6 +68,11 @@ public class FileServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> imple
     }
 
     @Override
+    public boolean updateFile(FileInfo fileInfo) {
+        return fileInfoMapper.update(fileInfo) > 0;
+    }
+
+    @Override
     public String getFileUrl(Long id) {
         FileInfo fileInfo = fileInfoMapper.selectOneById(id);
         return fileInfo != null ? fileInfo.getFileUrl() : null;

@@ -45,6 +45,16 @@ public class GeneratorColumnServiceImpl extends ServiceImpl<GenTableColumnMapper
     }
 
     @Override
+    public boolean deleteColumn(Long id) {
+        return genTableColumnMapper.deleteById(id) > 0;
+    }
+
+    @Override
+    public boolean updateColumn(GenTableColumn column) {
+        return genTableColumnMapper.update(column) > 0;
+    }
+
+    @Override
     public GenTable getTableWithColumns(Long id) {
         GenTable table = genTableMapper.selectOneById(id);
         if (table != null) {
