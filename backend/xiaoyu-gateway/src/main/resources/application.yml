@@ -1,0 +1,118 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: xiaoyu-gateway
+  cloud:
+    nacos:
+      server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      config:
+        group: DEFAULT_GROUP
+        file-extension: yml
+      discovery:
+        group: DEFAULT_GROUP
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 系统模块
+        - id: xiaoyu-system
+          uri: lb://xiaoyu-module-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        # 认证模块
+        - id: xiaoyu-auth
+          uri: lb://xiaoyu-module-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        # AI模块
+        - id: xiaoyu-ai
+          uri: lb://xiaoyu-module-ai
+          predicates:
+            - Path=/ai/**
+          filters:
+            - StripPrefix=1
+        # IM模块
+        - id: xiaoyu-im
+          uri: lb://xiaoyu-module-im
+          predicates:
+            - Path=/im/**
+          filters:
+            - StripPrefix=1
+        # 文件模块
+        - id: xiaoyu-file
+          uri: lb://xiaoyu-module-file
+          predicates:
+            - Path=/file/**
+          filters:
+            - StripPrefix=1
+        # 工作流模块
+        - id: xiaoyu-workflow
+          uri: lb://xiaoyu-module-workflow
+          predicates:
+            - Path=/workflow/**
+          filters:
+            - StripPrefix=1
+        # 代码生成模块
+        - id: xiaoyu-generator
+          uri: lb://xiaoyu-module-generator
+          predicates:
+            - Path=/generator/**
+          filters:
+            - StripPrefix=1
+        # 报表模块
+        - id: xiaoyu-report
+          uri: lb://xiaoyu-module-report
+          predicates:
+            - Path=/report/**
+          filters:
+            - StripPrefix=1
+        # 监控模块
+        - id: xiaoyu-monitor
+          uri: lb://xiaoyu-module-monitor
+          predicates:
+            - Path=/monitor/**
+          filters:
+            - StripPrefix=1
+        # 定时任务模块
+        - id: xiaoyu-job
+          uri: lb://xiaoyu-module-job
+          predicates:
+            - Path=/job/**
+          filters:
+            - StripPrefix=1
+      global-filters:
+        - GatewayRequestFilters
+
+# Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+# Knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
