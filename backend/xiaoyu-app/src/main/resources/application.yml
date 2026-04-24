@@ -13,6 +13,16 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  # Nacos配置(单体模式关闭)
+  cloud:
+    nacos:
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+      discovery:
+        enabled: false
+
 
 # 小羽框架配置
 xiaoyu:
@@ -26,6 +36,25 @@ xiaoyu:
       - /auth/logout
       - /health
       - /actuator/**
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /doc.html
+      - /webjars/**
+      - /favicon.ico
+  swagger:
+    enabled: true
+    title: "小羽快速开发框架 API"
+    description: "小羽快速开发框架 API 文档"
+    version: "1.0.0"
+    groups:
+      - name: "auth"
+        title: "认证授权"
+        description: "用户登录注册、Token管理"
+        packageScan: "com.xiaoyu.module.auth"
+      - name: "system"
+        title: "系统管理"
+        description: "系统用户管理"
+        packageScan: "com.xiaoyu.module.system"
 
 # MyBatis-Flex 配置
 mybatis-flex:
@@ -44,6 +73,25 @@ management:
   endpoint:
     health:
       show-details: always
+
+
+# Knife4j 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'auth'
+      paths-to-match: '/auth/**'
+      packages-to-scan: 'com.xiaoyu.module.auth'
+    - group: 'system'
+      paths-to-match: '/system/**'
+      packages-to-scan: 'com.xiaoyu.module.system'
+  knife4j:
+    enable: true
+    setting:
+      language: zh_CN
 
 # 日志配置
 logging:

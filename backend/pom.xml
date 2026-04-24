@@ -19,6 +19,8 @@
         <module>xiaoyu-api</module>
         <!-- 业务模块 -->
         <module>xiaoyu-modules</module>
+        <!-- 网关 -->
+        <module>xiaoyu-gateway</module>
         <!-- 单体应用启动器 -->
         <module>xiaoyu-app</module>
     </modules>
@@ -39,7 +41,7 @@
         <!-- 数据库版本 -->
         <mysql.version>8.0.33</mysql.version>
         <druid.version>1.2.23</druid.version>
-        <mybatis-flex.version>3.1.2</mybatis-flex.version>
+        <mybatis-flex.version>1.10.8</mybatis-flex.version>
 
         <!-- Redis 版本 -->
         <redisson.version>3.27.2</redisson.version>
@@ -70,6 +72,9 @@
         <!-- 监控 -->
         <spring-boot-actuator.version>3.2.4</spring-boot-actuator.version>
         <prometheus.client.version>1.12.5</prometheus.client.version>
+
+        <!-- Knife4j -->
+        <knife4j.version>4.5.0</knife4j.version>
 
         <!-- 其他 -->
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
@@ -126,7 +131,12 @@
             </dependency>
             <dependency>
                 <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-spring-boot-starter</artifactId>
+                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-core</artifactId>
                 <version>${mybatis-flex.version}</version>
             </dependency>
             <dependency>
@@ -152,6 +162,11 @@
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-redis-jackson</artifactId>
                 <version>${sa-token.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.9.22</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -212,24 +227,14 @@
             <dependency>
                 <groupId>com.alibaba.nacos</groupId>
                 <artifactId>nacos-client</artifactId>
-                <version>${nacos-client.version}</version>
+                <version>2.3.2</version>
             </dependency>
 
             <!-- Sentinel -->
             <dependency>
                 <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-core</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-spring-boot-starter</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
                 <artifactId>sentinel-feign-adapter</artifactId>
-                <version>${sentinel.version}</version>
+                <version>1.8.8</version>
             </dependency>
 
             <!-- 文件存储 -->
@@ -248,6 +253,21 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-spring-boot-starter</artifactId>
+                <version>${flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-engine</artifactId>
+                <version>${flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-bpmn-model</artifactId>
+                <version>${flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-bpmn-converter</artifactId>
                 <version>${flowable.version}</version>
             </dependency>
 
@@ -287,6 +307,12 @@
                 <version>${commons-codec.version}</version>
             </dependency>
 
+            <!-- Knife4j -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
             <!-- 项目内部模块 -->
             <dependency>
                 <groupId>com.xiaoyu</groupId>
@@ -296,6 +322,11 @@
             <dependency>
                 <groupId>com.xiaoyu</groupId>
                 <artifactId>xiaoyu-common-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xiaoyu</groupId>
+                <artifactId>xiaoyu-common-swagger</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -316,6 +347,11 @@
             <dependency>
                 <groupId>com.xiaoyu</groupId>
                 <artifactId>xiaoyu-module-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xiaoyu</groupId>
+                <artifactId>xiaoyu-module-workflow</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

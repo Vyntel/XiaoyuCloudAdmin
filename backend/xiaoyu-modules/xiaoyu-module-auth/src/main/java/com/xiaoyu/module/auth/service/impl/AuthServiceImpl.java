@@ -1,41 +1,100 @@
 package com.xiaoyu.module.auth.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.LineCaptcha;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import com.xiaoyu.api.auth.vo.LoginVO;
+import com.xiaoyu.api.system.api.SystemUserApi;
+import com.xiaoyu.api.system.dto.UserDTO;
+import com.xiaoyu.api.system.vo.UserVO;
+import com.xiaoyu.common.core.result.Result;
 import com.xiaoyu.module.auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 认证 Service 实现
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+    private final SystemUserApi systemUserApi;
+    private final StringRedisTemplate redisTemplate;
+
+    /**
+     * 验证码Redis Key前缀
+     */
+    private static final String CAPTCHA_KEY_PREFIX = "captcha:";
+    /**
+     * 短信验证码Redis Key前缀
+     */
+    private static final String SMS_CODE_KEY_PREFIX = "sms:";
+    /**
+     * 邮箱验证码Redis Key前缀
+     */
+    private static final String EMAIL_CODE_KEY_PREFIX = "email:";
+    /**
+     * 刷新Token Redis Key前缀
+     */
+    private static final String REFRESH_TOKEN_KEY_PREFIX = "refresh_token:";
+    /**
+     * 验证码有效期（分钟）
+     */
+    private static final int CAPTCHA_EXPIRE_MINUTES = 5;
+    /**
+     * 短信/邮箱验证码有效期（分钟）
+     */
+    private static final int CODE_EXPIRE_MINUTES = 10;
 
     /**
      * 用户登录
      */
     @Override
     public LoginVO login(String username, String password, String captchaId, String captchaCode, Boolean rememberMe) {
-        // TODO: 实现验证码校验
-        // TODO: 实现密码校验
-        
-        // 使用 Sa-Token 登录
-        StpUtil.login(username);
-        String token = StpUtil.getTokenValue();
-        
-        // 构建返回结果
+        // 1. 验证验证码
+        validateCaptcha(captchaId, captchaCode);
+
+        // 2. 获取用户信息（通过Feign API）
+        Result<UserVO> userResult = systemUserApi.getUserByUsername(username);
+        if (!userResult.isSuccess() || userResult.getData() == null) {
+            throw new RuntimeException("用户名或密码错误");
+        }
+        UserVO userVO = userResult.getData();
+
+        // 3. 验证密码
+        if (!BCrypt.checkpw(password, userVO.getPassword())) {
+            throw new RuntimeException("用户名或密码错误");
+        }
+
+        // 4. 检查用户状态
+        if (userVO.getStatus() != null && userVO.getStatus() == 1) {
+            throw new RuntimeException("账号已被禁用");
+        }
+
+        // 5. 使用 Sa-Token 登录
+        StpUtil.login(userVO.getId(), rememberMe != null && rememberMe);
+        String accessToken = StpUtil.getTokenValue();
+
+        // 6. 生成刷新Token
+        String refreshToken = generateRefreshToken(userVO.getId());
+
+        // 7. 构建返回结果
         LoginVO loginVO = new LoginVO();
-        loginVO.setAccessToken(token);
-        loginVO.setRefreshToken(token); // TODO: 生成独立的 refresh token
+        loginVO.setAccessToken(accessToken);
+        loginVO.setRefreshToken(refreshToken);
         loginVO.setTokenType("Bearer");
         loginVO.setExpiresIn(StpUtil.getTokenTimeout());
-        loginVO.setUsername(username);
-        // TODO: 设置用户其他信息
-        
+        loginVO.setUsername(userVO.getUsername());
+
         log.info("用户登录成功: {}", username);
         return loginVO;
     }
@@ -45,8 +104,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logout() {
+        Object loginId = StpUtil.getLoginId();
         StpUtil.logout();
-        log.info("用户登出成功");
+        log.info("用户登出成功, userId: {}", loginId);
     }
 
     /**
@@ -54,14 +114,30 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public Long register(String username, String nickname, String password, String phone, String email) {
-        // TODO: 实现用户注册逻辑
         // 1. 检查用户名是否存在
-        // 2. 加密密码
-        // 3. 保存用户信息
-        // 4. 返回用户ID
-        
-        log.info("用户注册: {}", username);
-        return 1L; // TODO: 返回实际用户ID
+        Result<UserVO> existResult = systemUserApi.getUserByUsername(username);
+        if (existResult.isSuccess() && existResult.getData() != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+
+        // 2. 创建用户DTO
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setNickname(nickname != null ? nickname : username);
+        userDTO.setPassword(BCrypt.hashpw(password));
+        userDTO.setPhone(phone);
+        userDTO.setEmail(email);
+        userDTO.setStatus(0);
+
+        // 3. 保存用户（通过Feign API）
+        Result<Long> result = systemUserApi.createUser(userDTO);
+        if (!result.isSuccess()) {
+            throw new RuntimeException("用户注册失败: " + result.getMessage());
+        }
+
+        Long userId = result.getData();
+        log.info("用户注册成功: {}, userId: {}", username, userId);
+        return userId;
     }
 
     /**
@@ -69,10 +145,30 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public LoginVO refreshToken(String refreshToken) {
-        // TODO: 实现 token 刷新逻辑
+        // 1. 验证刷新Token
+        String userIdStr = redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY_PREFIX + refreshToken);
+        if (userIdStr == null) {
+            throw new RuntimeException("刷新Token已失效");
+        }
+
+        Long userId = Long.parseLong(userIdStr);
+
+        // 2. 删除旧刷新Token
+        redisTemplate.delete(REFRESH_TOKEN_KEY_PREFIX + refreshToken);
+
+        // 3. 生成新Token
+        StpUtil.login(userId);
+        String newAccessToken = StpUtil.getTokenValue();
+        String newRefreshToken = generateRefreshToken(userId);
+
+        // 4. 返回结果
         LoginVO loginVO = new LoginVO();
-        loginVO.setAccessToken(refreshToken);
+        loginVO.setAccessToken(newAccessToken);
+        loginVO.setRefreshToken(newRefreshToken);
         loginVO.setTokenType("Bearer");
+        loginVO.setExpiresIn(StpUtil.getTokenTimeout());
+
+        log.info("Token刷新成功, userId: {}", userId);
         return loginVO;
     }
 
@@ -81,9 +177,25 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public String getCaptcha(String captchaId) {
-        // TODO: 实现验证码生成逻辑
-        // 返回验证码图片的 base64 编码
-        return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+        // 生成图形验证码
+        LineCaptcha captcha = CaptchaUtil.createLineCaptcha(120, 40, 4, 30);
+        String code = captcha.getCode();
+        String imageBase64 = captcha.getImageBase64();
+
+        // 生成新的验证码ID
+        String realCaptchaId = captchaId != null && !captchaId.isEmpty() ? captchaId : IdUtil.simpleUUID();
+
+        // 存储到Redis
+        redisTemplate.opsForValue().set(
+            CAPTCHA_KEY_PREFIX + realCaptchaId,
+            code.toLowerCase(),
+            CAPTCHA_EXPIRE_MINUTES,
+            TimeUnit.MINUTES
+        );
+
+        log.debug("生成验证码: {}", realCaptchaId);
+        // 返回验证码图片和ID
+        return imageBase64 + "|" + realCaptchaId;
     }
 
     /**
@@ -91,8 +203,19 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void sendSmsCode(String phone) {
-        // TODO: 实现短信验证码发送逻辑
-        log.info("发送短信验证码到: {}", phone);
+        // 生成6位数字验证码
+        String code = RandomUtil.randomNumbers(6);
+
+        // 存储到Redis
+        redisTemplate.opsForValue().set(
+            SMS_CODE_KEY_PREFIX + phone,
+            code,
+            CODE_EXPIRE_MINUTES,
+            TimeUnit.MINUTES
+        );
+
+        // TODO: 集成短信发送服务
+        log.info("发送短信验证码到: {}, code: {}", phone, code);
     }
 
     /**
@@ -100,7 +223,57 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void sendEmailCode(String email) {
-        // TODO: 实现邮箱验证码发送逻辑
-        log.info("发送邮箱验证码到: {}", email);
+        // 生成6位数字验证码
+        String code = RandomUtil.randomNumbers(6);
+
+        // 存储到Redis
+        redisTemplate.opsForValue().set(
+            EMAIL_CODE_KEY_PREFIX + email,
+            code,
+            CODE_EXPIRE_MINUTES,
+            TimeUnit.MINUTES
+        );
+
+        // TODO: 集成邮件发送服务
+        log.info("发送邮箱验证码到: {}, code: {}", email, code);
+    }
+
+    /**
+     * 验证验证码
+     */
+    private void validateCaptcha(String captchaId, String captchaCode) {
+        if (captchaId == null || captchaId.isEmpty()) {
+            throw new RuntimeException("请输入验证码");
+        }
+        if (captchaCode == null || captchaCode.isEmpty()) {
+            throw new RuntimeException("请输入验证码");
+        }
+
+        String code = redisTemplate.opsForValue().get(CAPTCHA_KEY_PREFIX + captchaId);
+        if (code == null) {
+            throw new RuntimeException("验证码已失效");
+        }
+        if (!code.equalsIgnoreCase(captchaCode)) {
+            // 验证失败后删除验证码
+            redisTemplate.delete(CAPTCHA_KEY_PREFIX + captchaId);
+            throw new RuntimeException("验证码错误");
+        }
+
+        // 验证成功后删除验证码
+        redisTemplate.delete(CAPTCHA_KEY_PREFIX + captchaId);
+    }
+
+    /**
+     * 生成刷新Token
+     */
+    private String generateRefreshToken(Long userId) {
+        String refreshToken = IdUtil.simpleUUID();
+        redisTemplate.opsForValue().set(
+            REFRESH_TOKEN_KEY_PREFIX + refreshToken,
+            userId.toString(),
+            7,
+            TimeUnit.DAYS
+        );
+        return refreshToken;
     }
 }

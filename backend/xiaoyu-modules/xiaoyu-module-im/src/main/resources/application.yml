@@ -1,0 +1,27 @@
+server:
+  port: 8204
+
+spring:
+  application:
+    name: xiaoyu-module-im
+  cloud:
+    nacos:
+      server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+      config:
+        group: DEFAULT_GROUP
+        file-extension: yml
+      discovery:
+        group: DEFAULT_GROUP
+
+# Knife4j
+knife4j:
+  enable: true
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

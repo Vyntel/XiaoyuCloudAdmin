@@ -1,10 +1,15 @@
 package com.xiaoyu.module.system.service.impl;
 
 import cn.hutool.crypto.digest.BCrypt;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.xiaoyu.common.core.exception.ServiceException;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.xiaoyu.common.core.utils.XiaoYuBeanUtil;
+import com.xiaoyu.common.core.utils.XiaoYuThrowUtil;
 import com.xiaoyu.module.system.entity.SystemUser;
+import com.xiaoyu.module.system.entity.SystemUserRole;
 import com.xiaoyu.module.system.mapper.SystemUserMapper;
+import com.xiaoyu.module.system.mapper.SystemUserRoleMapper;
 import com.xiaoyu.module.system.service.SystemUserService;
 import com.xiaoyu.api.system.vo.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -12,156 +17,132 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * 系统用户 Service 实现
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SystemUserServiceImpl implements SystemUserService {
+public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemUser> implements SystemUserService {
 
     private final SystemUserMapper systemUserMapper;
+    private final SystemUserRoleMapper systemUserRoleMapper;
 
     @Override
     public List<UserVO> getUserPage(Integer pageNum, Integer pageSize, String username, String nickname, Integer status, Long deptId) {
-        // TODO: 实现分页查询
-        return Collections.emptyList();
+        QueryWrapper q = QueryWrapper.create()
+                .like("username", username)
+                .like("nickname", nickname)
+                .eq("status", status)
+                .eq("dept_id", deptId)
+                .orderBy("create_time", false);
+        
+        Page<SystemUser> page = systemUserMapper.paginate(pageNum, pageSize, q);
+        return page.getRecords().stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public UserVO getUserById(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
         return convertToVO(user);
     }
 
     @Override
     public UserVO getUserByUsername(String username) {
-        LambdaQueryWrapper<SystemUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SystemUser::getUsername, username);
-        SystemUser user = systemUserMapper.selectOne(queryWrapper);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
+        QueryWrapper q = QueryWrapper.create().where("username", username);
+        SystemUser user = systemUserMapper.selectOneByQuery(q);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
         return convertToVO(user);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Long createUser(SystemUser user) {
-        // 检查用户名是否存在
-        LambdaQueryWrapper<SystemUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SystemUser::getUsername, user.getUsername());
-        Long count = systemUserMapper.selectCount(queryWrapper);
-        if (count > 0) {
-            throw new ServiceException("用户已存在");
-        }
-
-        // 加密密码
+        QueryWrapper q = QueryWrapper.create().where("username", user.getUsername());
+        XiaoYuThrowUtil.throwIfFalse(systemUserMapper.selectCountByQuery(q) == 0, "用户已存在");
         user.setPassword(BCrypt.hashpw(user.getPassword()));
         user.setStatus(0);
         systemUserMapper.insert(user);
-        return user.getUserId();
+        return user.getId();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void updateUser(SystemUser user) {
-        SystemUser existUser = systemUserMapper.selectById(user.getUserId());
-        if (existUser == null) {
-            throw new ServiceException("用户不存在");
-        }
-
-        // 不更新密码
+        XiaoYuThrowUtil.throwIfNull(systemUserMapper.selectOneById(user.getId()), "用户不存在");
         user.setPassword(null);
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteUser(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
+        // 删除用户角色关联
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        systemUserRoleMapper.deleteByQuery(q);
+        // 逻辑删除用户
         systemUserMapper.deleteById(userId);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void resetPassword(Long userId) {
-        SystemUser user = systemUserMapper.selectById(userId);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
-        // 默认密码：123456
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
         user.setPassword(BCrypt.hashpw("123456"));
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void changePassword(Long userId, String oldPassword, String newPassword) {
-        SystemUser user = systemUserMapper.selectById(userId);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
-
-        // 验证旧密码
-        if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
-            throw new ServiceException("原密码错误");
-        }
-
-        // 设置新密码
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
+        XiaoYuThrowUtil.throwIfFalse(BCrypt.checkpw(oldPassword, user.getPassword()), "原密码错误");
         user.setPassword(BCrypt.hashpw(newPassword));
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void updateStatus(Long userId, Integer status) {
-        SystemUser user = systemUserMapper.selectById(userId);
-        if (user == null) {
-            throw new ServiceException("用户不存在");
-        }
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
         user.setStatus(status);
-        systemUserMapper.updateById(user);
+        systemUserMapper.update(user);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void assignRoles(Long userId, List<Long> roleIds) {
-        // TODO: 实现角色分配
+        SystemUser user = systemUserMapper.selectOneById(userId);
+        XiaoYuThrowUtil.throwIfNull(user, "用户不存在");
+        // 删除旧关联
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        systemUserRoleMapper.deleteByQuery(q);
+        // 插入新关联
+        for (Long roleId : roleIds) {
+            SystemUserRole ur = new SystemUserRole();
+            ur.setUserId(userId);
+            ur.setRoleId(roleId);
+            systemUserRoleMapper.insert(ur);
+        }
+        log.info("用户ID: {} 角色分配完成，共 {} 个角色", userId, roleIds.size());
     }
 
     @Override
     public List<Long> getUserRoleIds(Long userId) {
-        // TODO: 实现获取用户角色ID列表
-        return Collections.emptyList();
+        QueryWrapper q = QueryWrapper.create().where("user_id", userId);
+        List<SystemUserRole> list = systemUserRoleMapper.selectListByQuery(q);
+        return list.stream().map(SystemUserRole::getRoleId).collect(Collectors.toList());
     }
 
-    /**
-     * 转换为VO
-     */
     private UserVO convertToVO(SystemUser user) {
-        UserVO vo = new UserVO();
-        vo.setUserId(user.getUserId());
-        vo.setUsername(user.getUsername());
-        vo.setNickname(user.getNickname());
-        vo.setEmail(user.getEmail());
-        vo.setPhone(user.getPhone());
-        vo.setAvatar(user.getAvatar());
-        vo.setSex(user.getSex());
-        vo.setDeptId(user.getDeptId());
-        vo.setStatus(user.getStatus());
-        vo.setCreateTime(user.getCreateTime());
-        vo.setUpdateTime(user.getUpdateTime());
-        vo.setRemark(user.getRemark());
-        return vo;
+        return XiaoYuBeanUtil.copy(user, UserVO.class);
     }
 }

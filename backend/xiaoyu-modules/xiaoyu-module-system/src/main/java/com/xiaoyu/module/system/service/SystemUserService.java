@@ -1,5 +1,6 @@
 package com.xiaoyu.module.system.service;
 
+import com.mybatisflex.core.service.IService;
 import com.xiaoyu.api.system.vo.UserVO;
 import com.xiaoyu.module.system.entity.SystemUser;
 
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * 系统用户 Service
  */
-public interface SystemUserService {
+public interface SystemUserService extends IService<SystemUser> {
 
     /**
      * 分页查询用户列表

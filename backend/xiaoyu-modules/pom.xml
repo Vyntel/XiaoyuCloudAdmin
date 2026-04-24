@@ -19,6 +19,14 @@
     <modules>
         <module>xiaoyu-module-system</module>
         <module>xiaoyu-module-auth</module>
+        <module>xiaoyu-module-ai</module>
+        <module>xiaoyu-module-workflow</module>
+        <module>xiaoyu-module-im</module>
+        <module>xiaoyu-module-file</module>
+        <module>xiaoyu-module-report</module>
+        <module>xiaoyu-module-monitor</module>
+        <module>xiaoyu-module-generator</module>
+        <module>xiaoyu-module-job</module>
     </modules>
 
 </project>
